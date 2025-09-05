@@ -50,12 +50,11 @@ export default function App() {
     setColorName("White Screen");
   };
 
-  // ✅ CORRECTED AND SIMPLIFIED DOWNLOAD FUNCTION
+  // ✅ DOWNLOAD FUNCTION
   const downloadImage = () => {
     let width = 1920;
     let height = 1080;
 
-    // Determine the final resolution based on user selection
     if (resolution === "480p") {
       width = 854; height = 480;
     } else if (resolution === "720p") {
@@ -69,38 +68,22 @@ export default function App() {
     } else if (resolution === "4320p") {
       width = 7680; height = 4320;
     } else if (resolution === "custom") {
-      // Use custom dimensions, with fallbacks to 1920x1080 if invalid
       width = Number(customWidth) || 1920;
       height = Number(customHeight) || 1080;
     }
 
-    // 1. Create a new canvas element in memory
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-
-    // 2. Get the 2D drawing context from the canvas
     const ctx = canvas.getContext("2d");
-
-    // 3. Set the fill color to the currently selected color state
     ctx.fillStyle = color;
-
-    // 4. Draw a filled rectangle that covers the entire canvas area
     ctx.fillRect(0, 0, width, height);
 
-    // 5. Create a temporary link element to trigger the download
     const link = document.createElement("a");
-    
-    // 6. Set the download filename
-    link.download = `${colorName.replace(/ /g, '_')}_${width}x${height}.png`;
-    
-    // 7. Set the link's href to the canvas data as a PNG image
+    link.download = `${colorName.replace(/ /g, "_")}_${width}x${height}.png`;
     link.href = canvas.toDataURL("image/png");
-    
-    // 8. Programmatically click the link to start the download
     link.click();
   };
-
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -134,14 +117,18 @@ export default function App() {
 
         <div
           id="preview"
-          className={`${isFull ? "w-full h-full" : "w-[600px] h-[350px] border rounded-lg shadow-lg"} relative flex items-center justify-center`}
+          onClick={toggleFull}  // ✅ Preview click = fullscreen
+          className={`${isFull ? "w-full h-full" : "w-[600px] h-[350px] border rounded-4xl shadow-lg"} relative flex items-center justify-center`}
           style={{ backgroundColor: color }}
         >
           {/* Controls - hidden in fullscreen */}
           {!isFull && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-3 bg-black/20 px-3 py-2 rounded-lg backdrop-blur-md">
               <button
-                onClick={resetColor}
+                onClick={(e) => {
+                  e.stopPropagation(); // ✅ prevent fullscreen toggle
+                  resetColor();
+                }}
                 className="text-sm px-3 py-2 rounded-lg bg-white/90 cursor-pointer"
               >
                 Reset
@@ -151,7 +138,13 @@ export default function App() {
 
           {/* Fullscreen Button */}
           {!isFull && (
-            <button onClick={toggleFull} className="absolute bottom-3 right-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ prevent fullscreen toggle
+                toggleFull();
+              }}
+              className="absolute bottom-3 right-3"
+            >
               <svg
                 height="32"
                 width="32"
@@ -170,7 +163,9 @@ export default function App() {
           )}
 
           {!isFull && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs opacity-80">
+            <div
+              className={`absolute bottom-4 left-1/2 -translate-x-1/2 text-xs opacity-80 ${color === "#000000" ? "text-white" : "text-black"}`}
+            >
               Press ESC to exit fullscreen
             </div>
           )}
