@@ -1,7 +1,9 @@
-import React from 'react'
+// File: src/pages/Home.jsx
+
+import React from 'react';
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import tinycolor from 'tinycolor2'; // Color name handling ke liye
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import tinycolor from 'tinycolor2';
 
 // Predefined color lists
 const COLORS = [
@@ -33,78 +35,69 @@ export default function Home() {
   const [customHeight, setCustomHeight] = useState(1080);
   
   // React Router hooks
-  const { colorSlug, customHex: customHexFromUrl, colorName: colorNameFromUrl } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const { colorIdentifier } = useParams();
 
-  // URL se color set karne ke liye
+  // URL se color set karne ka logic
   useEffect(() => {
     let colorSet = false;
-    // Priority 1: Custom hex URL (/custom/ff0000)
-    if (customHexFromUrl) {
-      const colorObj = tinycolor(customHexFromUrl);
-      if (colorObj.isValid()) {
-        const hex = colorObj.toHexString();
-        setColor(hex);
-        setCustomHex(hex);
-        setColorName("Custom Color");
-        colorSet = true;
-      }
-    }
-
     
-
-    // Priority 2: Color name URL (/color/tomato)
-    else if (colorNameFromUrl) {
-        const colorObj = tinycolor(colorNameFromUrl);
-        if (colorObj.isValid()) {
-            const hex = colorObj.toHexString();
-            setColor(hex);
-            setCustomHex(hex);
-            const name = colorNameFromUrl.charAt(0).toUpperCase() + colorNameFromUrl.slice(1);
-            setColorName(name);
-            colorSet = true;
-        }
-    }
-    // Priority 3: Predefined slug URL (/red-screen)
-    else if (colorSlug) {
-      const foundColor = ALL_COLORS.find(c => c.slug === colorSlug);
+    if (colorIdentifier) {
+      const foundColor = ALL_COLORS.find(c => c.slug === colorIdentifier);
       if (foundColor) {
+        // Handle predefined slugs like "/red-screen"
         setColor(foundColor.value);
         setColorName(foundColor.name);
         setCustomHex(foundColor.value);
         colorSet = true;
+      } else {
+        // Handle custom hex/names like "/FF0000" or "/tomato"
+        const colorObj = tinycolor(colorIdentifier);
+        if (colorObj.isValid()) {
+          const hex = colorObj.toHexString();
+          setColor(hex);
+          setCustomHex(hex);
+          const isHexFormat = colorIdentifier.match(/^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/i);
+          setColorName(isHexFormat ? "Custom Color" : colorIdentifier.charAt(0).toUpperCase() + colorIdentifier.slice(1));
+          colorSet = true;
+        }
       }
     }
     
-    // Default (agar koi valid color URL mein nahi mila)
+    // Fallback to default (White Screen) if URL has no valid color
     if (!colorSet) {
       const whiteScreen = ALL_COLORS.find(c => c.slug === 'white-screen');
       if (whiteScreen) {
-          setColor(whiteScreen.value);
-          setColorName(whiteScreen.name);
-          setCustomHex(whiteScreen.value);
+        setColor(whiteScreen.value);
+        setColorName(whiteScreen.name);
+        setCustomHex(whiteScreen.value);
       }
     }
-  }, [colorSlug, customHexFromUrl, colorNameFromUrl]);
+  }, [colorIdentifier]);
 
-  // Custom picker se URL update karne ke liye
+  // State change hone par URL update karne ka logic
   useEffect(() => {
-    if (colorName.toLowerCase() === "custom color" || !ALL_COLORS.some(c => c.name.toLowerCase() === colorName.toLowerCase())) {
-      const colorObj = tinycolor(customHex);
-      if (colorObj.isValid()) {
-        const timer = setTimeout(() => {
-            const userInput = customHex;
-            if (userInput.startsWith('#') || (userInput.length === 6 && !isNaN(parseInt(userInput, 16)))) {
-                const urlHex = userInput.replace('#', '');
-                navigate(`/custom/${urlHex}`, { replace: true });
-            } else {
-                navigate(`/color/${userInput.toLowerCase()}`, { replace: true });
-            }
-        }, 800);
-        return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      let targetUrl = '';
+      const predefinedColor = ALL_COLORS.find(c => tinycolor.equals(c.value, color));
+
+      if (predefinedColor && predefinedColor.name === colorName) {
+        targetUrl = `/${predefinedColor.slug}`;
+      } else {
+        const userInput = customHex.trim();
+        if (userInput) {
+          targetUrl = `/${userInput.replace('#', '')}`;
+        }
       }
-    }
-  }, [customHex, colorName, navigate]);
+
+      if (targetUrl && targetUrl !== location.pathname) {
+        navigate(targetUrl, { replace: true });
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [color, colorName, customHex, navigate, location.pathname]);
 
   // Fullscreen detection
   useEffect(() => {
@@ -177,12 +170,12 @@ export default function Home() {
     setCustomHex(newValue);
     const colorObj = tinycolor(newValue);
     if (colorObj.isValid()) {
-        setColor(colorObj.toHexString());
+      setColor(colorObj.toHexString());
     }
     if (!newValue.startsWith('#')) {
-        setColorName(newValue.charAt(0).toUpperCase() + newValue.slice(1));
+      setColorName(newValue.charAt(0).toUpperCase() + newValue.slice(1));
     } else {
-        setColorName("Custom Color");
+      setColorName("Custom Color");
     }
   };
 
@@ -195,7 +188,7 @@ export default function Home() {
             {COLORS.map((c) => (
               <Link to={`/${c.slug}`} key={c.name} title={c.name}>
                 <div className={`w-28 h-20 rounded-lg cursor-pointer flex items-center justify-center transition-all duration-200 ${color === c.value ? "shadow-2xl ring-2 ring-yellow-700" : "shadow-md hover:shadow-lg"}`} style={{ backgroundColor: c.value }}>
-                  <span className={`text-sm font-bold ${c.value === "#000000" ? "text-white" : "text-black"}`}>{c.name}</span>
+                  <span className={`text-sm font-bold ${tinycolor(c.value).isDark() ? "text-white" : "text-black"}`}>{c.name}</span>
                 </div>
               </Link>
             ))}
@@ -212,7 +205,7 @@ export default function Home() {
                   <Link to="/white-screen" onClick={(e) => e.stopPropagation()} className="text-sm font-mono px-3 py-2 rounded-lg bg-white/90 cursor-pointer shadow-md hover:shadow-lg transition">Reset</Link>
                 </div>
                 <button onClick={(e) => { e.stopPropagation(); toggleFull(); }} className="cursor-pointer absolute bottom-4 right-4">
-                  <svg height="32" width="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill={color === "#000000" ? "white" : "black"}>
+                  <svg height="32" width="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill={tinycolor(color).isDark() ? "white" : "black"}>
                     <g>
                       <polygon points="29.414,26.586 22.828,20 20,22.828 26.586,29.414 24,32 32,32 32,24" />
                       <polygon points="2.586,5.414 9.172,12 12,9.172 5.414,2.586 8,0 0,0 0,8" />
@@ -221,7 +214,7 @@ export default function Home() {
                     </g>
                   </svg>
                 </button>
-                <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 text-xs opacity-80 ${color === "#000000" ? "text-white" : "text-black"}`}>Press ESC to exit fullscreen</div>
+                <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 text-xs opacity-80 ${tinycolor(color).isDark() ? "text-white" : "text-black"}`}>Press ESC to exit fullscreen</div>
               </>
             )}
           </div>
@@ -232,7 +225,7 @@ export default function Home() {
               {BOTTOM_COLORS.map((c) => (
                 <Link to={`/${c.slug}`} key={c.name} title={c.name}>
                   <div className={`w-28 h-20 rounded-lg cursor-pointer flex items-center justify-center transition-all duration-200 ${color === c.value ? "shadow-2xl ring-2 ring-yellow-700" : "shadow-md hover:shadow-lg"}`} style={{ backgroundColor: c.value }}>
-                    <span className={`text-sm font-bold ${c.value === "#000000" ? "text-white" : "text-black"}`}>{c.name}</span>
+                    <span className={`text-sm font-bold ${tinycolor(c.value).isDark() ? "text-white" : "text-black"}`}>{c.name}</span>
                   </div>
                 </Link>
               ))}
