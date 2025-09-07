@@ -1,31 +1,58 @@
-// File: src/App.js
-
 import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home.jsx";
-import PrankScreen from './pages/PrankScreen';
+
+// Components
+import Home, { ALL_COLORS } from "./pages/Home.jsx";
+import PrankScreen, { ALL_PRANKS } from './pages/PrankScreen';
 import About from './pages/About';
+import Contact from './pages/Contact.jsx';
+
+// Helper
+import tinycolor from 'tinycolor2';
+
+// ✅ YEH HAI AAPKA SMART COMPONENT, BINA ALAG FILE BANAYE
+// Yeh component decide karega ki URL ke hisaab se kya dikhana hai.
+const UrlIdentifier = () => {
+  const { identifier } = useParams();
+
+  // 1. Check karein ki kya identifier ek Prank hai
+  const isPrank = ALL_PRANKS.some(p => p.slug === identifier);
+  if (isPrank) {
+    return <PrankScreen />; // PrankScreen dikhayein
+  }
+
+  // 2. Check karein ki kya identifier ek Color hai
+  const isColor =
+    ALL_COLORS.some(c => c.slug === identifier) ||
+    tinycolor(identifier).isValid();
+  
+  if (isColor) {
+    return <Home />; // Home page dikhayein
+  }
+
+  // 3. Agar kuch na mile, to default Home page dikhayein
+  return <Home />;
+}
+
 
 export default function App() {
   return (
-    // ✅ CHANGE: BrowserRouter ab poori application ko yahan wrap karega.
+    // ✅ BrowserRouter yahan se hata diya gaya hai
     <BrowserRouter>
       <Navbar />
       <div className="pt-16">
         <Routes>
-          {/* 1. Pehle specific routes aayenge */}
+          {/* 1. Pehle specific (fixed) routes aayenge */}
           <Route path="/" element={<Home />} />
-          <Route path="/About" element={<About />} />
-
           <Route path="/Prank-Screen" element={<PrankScreen />} />
+          <Route path="/About" element={<About />} />
+          <Route path="/contact" element={<Contact/>} />
           
-          {/* PrankScreen ke liye base aur dynamic route */}
-          <Route path="/Prank-Screen/:prankSlug?" element={<PrankScreen />} />
-
-          {/* 2. ✅ CHANGE: Yeh dynamic route sabse AAKHIR mein aayega */}
-          {/* Yeh /red-screen, /ff0000, aur /tomato jaise sabhi color URLs ko pakad lega */}
-          <Route path="/:colorIdentifier" element={<Home />} />
+          
+          {/* 2. ✅ Final Smart "Catch-all" route (sabse aakhir mein) */}
+          {/* Yeh /red-screen, /broken-screen, etc. sabko handle karega */}
+          <Route path="/:identifier" element={<UrlIdentifier />} />
         </Routes>
       </div>
     </BrowserRouter>

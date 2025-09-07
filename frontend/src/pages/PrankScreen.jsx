@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 import VirusAlert from '../assets/virusalert.png';
 import BlueScreen from "../assets/blueScreen_fullHD.gif";
@@ -12,7 +11,6 @@ import NoiseSound from "../assets/noisesound.mp3";
 import FakeError from "../assets/fakeError.png"
 import HackerScreen from "../assets/hacker-typer.gif"
 import prank from "../assets/prank.webp";
-
 
 // Prank data with URL slugs
 const SIDEBAR_PRANKS = [
@@ -29,42 +27,19 @@ const BOTTOM_PRANKS = [
   { name: "Fake Update", type: "update", img: FakeUpdate, slug: "fake-update" },
 ];
 
-// Combined array for easy searching
-const ALL_PRANKS = [...SIDEBAR_PRANKS, ...BOTTOM_PRANKS];
+// ✅ YEH ZAROORI HAI: App.js iska istemal karega
+export const ALL_PRANKS = [...SIDEBAR_PRANKS, ...BOTTOM_PRANKS];
 
 export default function PrankScreen() {
-let navigate = useNavigate()
-
   const [activePrank, setActivePrank] = useState(null);
   const [isFull, setIsFull] = useState(false);
   const [prankName, setPrankName] = useState("Select a Prank");
   const audioRef = useRef(null);
 
-  // Get the slug from the URL
-  const { prankSlug } = useParams();
+  // ✅ 'identifier' (jo App.js se aa raha hai) ko 'prankSlug' naam denge
+  const { identifier: prankSlug } = useParams();
 
-   // ✅ NAYA useEffect: Prank select hone par URL update karne ke liye (Home.js jaisa)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      let targetUrl = '/Prank-Screen';
-      const currentPrank = ALL_PRANKS.find(p => p.type === activePrank);
-
-      if (currentPrank) {
-        targetUrl = `/Prank-Screen/${currentPrank.slug}`;
-      }
-
-      // Agar URL pehle se wahi nahi hai, tabhi navigate karein
-      if (targetUrl !== location.pathname) {
-        navigate(targetUrl, { replace: true });
-      }
-    }, 500); // 500ms ka delay
-
-    return () => clearTimeout(timer);
-  }, [activePrank, navigate, location.pathname]);
-
-
-
-  // Set the active prank based on the URL slug
+  // URL se prank set karne ka logic
   useEffect(() => {
     if (prankSlug) {
       const foundPrank = ALL_PRANKS.find(p => p.slug === prankSlug);
@@ -73,6 +48,7 @@ let navigate = useNavigate()
         setPrankName(foundPrank.name);
       }
     } else {
+      // Agar base URL /Prank-Screen par hain to reset karein
       resetPrank();
     }
   }, [prankSlug]);
@@ -84,7 +60,7 @@ let navigate = useNavigate()
     return () => document.removeEventListener("fullscreenchange", handleChange);
   }, []);
 
-  // Block back button in fullscreen
+  // Back button block in fullscreen
   useEffect(() => {
     const handlePopState = () => {
       if (isFull) {
@@ -92,20 +68,17 @@ let navigate = useNavigate()
         alert("Exit fullscreen first before leaving!");
       }
     };
-
     const handleBeforeUnload = (e) => {
       if (isFull) {
         e.preventDefault();
         e.returnValue = "";
       }
     };
-
     if (isFull) {
       window.history.pushState(null, "", window.location.href);
       window.addEventListener("popstate", handlePopState);
       window.addEventListener("beforeunload", handleBeforeUnload);
     }
-
     return () => {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -115,7 +88,7 @@ let navigate = useNavigate()
   // Noise sound play/stop logic
   useEffect(() => {
     if (activePrank === "gps") { // 'gps' is the type for Noise Screen
-      audioRef.current.play().catch(() => { });
+      audioRef.current.play().catch(() => {});
     } else {
       if (audioRef.current && !audioRef.current.paused) {
         audioRef.current.pause();
@@ -141,13 +114,13 @@ let navigate = useNavigate()
   return (
     <>
       <audio ref={audioRef} src={NoiseSound} loop />
-
       <div className="bg-gray-300 w-full flex h-screen overflow-hidden">
         {/* Left Sidebar */}
         {!isFull && (
           <div className="flex z-1 relative left-40 top-15 flex-col gap-6 p-6">
             {SIDEBAR_PRANKS.map((p) => (
-              <Link to={`/Prank-Screen/${p.slug}`} key={p.type}>
+              // ✅ Link ab root URL par point karega (e.g., /hacker-screen)
+              <Link to={`/${p.slug}`} key={p.type}>
                 <div className={`w-28 h-28 rounded-lg cursor-pointer flex flex-col items-center justify-end transition-all duration-200`}>
                   <img src={p.img} alt={p.name} className="w-full h-20 object-cover rounded-2xl" />
                   <span className="text-xs font-medium mt-2 text-center text-black">{p.name}</span>
@@ -160,7 +133,6 @@ let navigate = useNavigate()
         {/* Main Preview */}
         <div className="flex-1 flex flex-col items-center justify-start p-6 relative right-38 cursor-pointer">
           {!isFull && <h1 className="text-4xl font-bold mb-6">{prankName}</h1>}
-
           <div
             id="preview-prank"
             onClick={toggleFull}
@@ -189,12 +161,12 @@ let navigate = useNavigate()
             {!isFull && (
               <button onClick={(e) => { e.stopPropagation(); toggleFull(); }} className="cursor-pointer absolute bottom-4 right-4">
                 <svg height="32" width="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="white">
-                    <g>
-                        <polygon points="29.414,26.586 22.828,20 20,22.828 26.586,29.414 24,32 32,32 32,24" />
-                        <polygon points="2.586,5.414 9.172,12 12,9.172 5.414,2.586 8,0 0,0 0,8" />
-                        <polygon points="26.586,2.586 20,9.172 22.828,12 29.414,5.414 32,8 32,0 24,0" />
-                        <polygon points="12,22.828 9.172,20 2.586,26.586 0,24 0,32 8,32 5.414,29.414" />
-                    </g>
+                  <g>
+                    <polygon points="29.414,26.586 22.828,20 20,22.828 26.586,29.414 24,32 32,32 32,24" />
+                    <polygon points="2.586,5.414 9.172,12 12,9.172 5.414,2.586 8,0 0,0 0,8" />
+                    <polygon points="26.586,2.586 20,9.172 22.828,12 29.414,5.414 32,8 32,0 24,0" />
+                    <polygon points="12,22.828 9.172,20 2.586,26.586 0,24 0,32 8,32 5.414,29.414" />
+                  </g>
                 </svg>
               </button>
             )}
@@ -210,11 +182,12 @@ let navigate = useNavigate()
           {!isFull && (
             <div className="flex gap-6 mt-10">
               {BOTTOM_PRANKS.map((p) => (
-                <Link to={`/Prank-Screen/${p.slug}`} key={p.type}>
-                    <div className={`w-28 h-28 rounded-lg cursor-pointer flex flex-col items-center justify-end transition-all duration-200`}>
+                // ✅ Link ab root URL par point karega (e.g., /blue-screen)
+                <Link to={`/${p.slug}`} key={p.type}>
+                  <div className={`w-28 h-28 rounded-lg cursor-pointer flex flex-col items-center justify-end transition-all duration-200`}>
                     <img src={p.img} alt={p.name} className="w-full h-20 object-cover rounded-2xl" />
                     <span className="text-xs font-bold mt-2 text-center text-black">{p.name}</span>
-                    </div>
+                  </div>
                 </Link>
               ))}
             </div>

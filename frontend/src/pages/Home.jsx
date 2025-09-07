@@ -1,5 +1,3 @@
-// File: src/pages/Home.jsx
-
 import React from 'react';
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
@@ -22,7 +20,8 @@ const BOTTOM_COLORS = [
   { name: "Blue Screen", value: "#0000FF", slug: "blue-screen" },
 ];
 
-const ALL_COLORS = [...COLORS, ...BOTTOM_COLORS];
+// ✅ YEH ZAROORI HAI: App.js iska istemal karega
+export const ALL_COLORS = [...COLORS, ...BOTTOM_COLORS];
 
 export default function Home() {
   // State variables
@@ -37,15 +36,15 @@ export default function Home() {
   // React Router hooks
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const { colorIdentifier } = useParams();
+  const { identifier } = useParams();
 
   // URL se color set karne ka logic
   useEffect(() => {
     let colorSet = false;
-    
-    if (colorIdentifier) {
-      const foundColor = ALL_COLORS.find(c => c.slug === colorIdentifier);
+    const urlIdentifier = identifier || (location.pathname === '/' ? 'white-screen' : '');
+
+    if (urlIdentifier) {
+      const foundColor = ALL_COLORS.find(c => c.slug === urlIdentifier);
       if (foundColor) {
         // Handle predefined slugs like "/red-screen"
         setColor(foundColor.value);
@@ -54,13 +53,12 @@ export default function Home() {
         colorSet = true;
       } else {
         // Handle custom hex/names like "/FF0000" or "/tomato"
-        const colorObj = tinycolor(colorIdentifier);
+        const colorObj = tinycolor(urlIdentifier);
         if (colorObj.isValid()) {
           const hex = colorObj.toHexString();
           setColor(hex);
           setCustomHex(hex);
-          const isHexFormat = colorIdentifier.match(/^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/i);
-          setColorName(isHexFormat ? "Custom Color" : colorIdentifier.charAt(0).toUpperCase() + colorIdentifier.slice(1));
+          setColorName(urlIdentifier);
           colorSet = true;
         }
       }
@@ -75,10 +73,14 @@ export default function Home() {
         setCustomHex(whiteScreen.value);
       }
     }
-  }, [colorIdentifier]);
+  }, [identifier, location.pathname]);
 
   // State change hone par URL update karne ka logic
   useEffect(() => {
+    // Ye effect homepage (path="/") par URL update na kare,
+    // taaki wo hamesha clean rahe jab tak user kuch select na kare.
+    if(location.pathname === '/' && colorName === 'White Screen') return;
+
     const timer = setTimeout(() => {
       let targetUrl = '';
       const predefinedColor = ALL_COLORS.find(c => tinycolor.equals(c.value, color));
@@ -86,9 +88,9 @@ export default function Home() {
       if (predefinedColor && predefinedColor.name === colorName) {
         targetUrl = `/${predefinedColor.slug}`;
       } else {
-        const userInput = customHex.trim();
-        if (userInput) {
-          targetUrl = `/${userInput.replace('#', '')}`;
+        const userInput = customHex.trim().replace('#', '');
+        if (userInput && tinycolor(userInput).isValid()) {
+          targetUrl = `/${userInput}`;
         }
       }
 
@@ -142,8 +144,7 @@ export default function Home() {
   };
 
   const downloadImage = () => {
-    let width = 1920;
-    let height = 1080;
+    let width = 1920; let height = 1080;
     if (resolution === "480p") { width = 854; height = 480; }
     else if (resolution === "720p") { width = 1280; height = 720; }
     else if (resolution === "1080p") { width = 1920; height = 1080; }
@@ -155,8 +156,7 @@ export default function Home() {
       height = Number(customHeight) || 1080;
     }
     const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext("2d");
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, width, height);
@@ -173,7 +173,7 @@ export default function Home() {
       setColor(colorObj.toHexString());
     }
     if (!newValue.startsWith('#')) {
-      setColorName(newValue.charAt(0).toUpperCase() + newValue.slice(1));
+      setColorName(newValue);
     } else {
       setColorName("Custom Color");
     }
@@ -202,16 +202,11 @@ export default function Home() {
             {!isFull && (
               <>
                 <div className="absolute top-4 right-4 flex gap-3 bg-black/10 px-3 py-1 rounded-lg backdrop-blur-md">
-                  <Link to="/white-screen" onClick={(e) => e.stopPropagation()} className="text-sm font-mono px-3 py-2 rounded-lg bg-white/90 cursor-pointer shadow-md hover:shadow-lg transition">Reset</Link>
+                  <Link to="/" onClick={(e) => e.stopPropagation()} className="text-sm font-mono px-3 py-2 rounded-lg bg-white/90 cursor-pointer shadow-md hover:shadow-lg transition">Reset</Link>
                 </div>
                 <button onClick={(e) => { e.stopPropagation(); toggleFull(); }} className="cursor-pointer absolute bottom-4 right-4">
                   <svg height="32" width="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill={tinycolor(color).isDark() ? "white" : "black"}>
-                    <g>
-                      <polygon points="29.414,26.586 22.828,20 20,22.828 26.586,29.414 24,32 32,32 32,24" />
-                      <polygon points="2.586,5.414 9.172,12 12,9.172 5.414,2.586 8,0 0,0 0,8" />
-                      <polygon points="26.586,2.586 20,9.172 22.828,12 29.414,5.414 32,8 32,0 24,0" />
-                      <polygon points="12,22.828 9.172,20 2.586,26.586 0,24 0,32 8,32 5.414,29.414" />
-                    </g>
+                    <g><polygon points="29.414,26.586 22.828,20 20,22.828 26.586,29.414 24,32 32,32 32,24" /><polygon points="2.586,5.414 9.172,12 12,9.172 5.414,2.586 8,0 0,0 0,8" /><polygon points="26.586,2.586 20,9.172 22.828,12 29.414,5.414 32,8 32,0 24,0" /><polygon points="12,22.828 9.172,20 2.586,26.586 0,24 0,32 8,32 5.414,29.414" /></g>
                   </svg>
                 </button>
                 <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 text-xs opacity-80 ${tinycolor(color).isDark() ? "text-white" : "text-black"}`}>Press ESC to exit fullscreen</div>
@@ -238,24 +233,12 @@ export default function Home() {
           <div className="z-1 relative right-35 top-25 w-1/5 p-6 flex flex-col space-y-4">
             <label className="font-semibold">Resolution</label>
             <select className="border p-2 rounded" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-              <option value="480p">480p</option>
-              <option value="720p">720p</option>
-              <option value="1080p">1080p</option>
-              <option value="1440p">1440p 2K</option>
-              <option value="2160p">2160p 4K</option>
-              <option value="4320p">4320p 8K</option>
-              <option value="custom">Custom</option>
+                <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p 2K</option><option value="2160p">2160p 4K</option><option value="4320p">4320p 8K</option><option value="custom">Custom</option>
             </select>
             {resolution === "custom" && (
               <>
-                <div className="flex items-center space-x-2">
-                  <input type="number" className="border p-2 w-24 rounded" value={customWidth} onChange={(e) => setCustomWidth(Number(e.target.value))} placeholder="1920" />
-                  <span>px</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="number" className="border p-2 w-24 rounded" value={customHeight} onChange={(e) => setCustomHeight(Number(e.target.value))} placeholder="1080" />
-                  <span>px</span>
-                </div>
+                <div className="flex items-center space-x-2"><input type="number" className="border p-2 w-24 rounded" value={customWidth} onChange={(e) => setCustomWidth(Number(e.target.value))} placeholder="1920" /><span>px</span></div>
+                <div className="flex items-center space-x-2"><input type="number" className="border p-2 w-24 rounded" value={customHeight} onChange={(e) => setCustomHeight(Number(e.target.value))} placeholder="1080" /><span>px</span></div>
               </>
             )}
             <button onClick={downloadImage} className="bg-gray-200 hover:bg-gray-300 p-2 rounded shadow">Download</button>
@@ -275,10 +258,7 @@ export default function Home() {
             <p className="text-sm text-gray-400">A simple color preview & download tool built with React + Tailwind CSS.</p>
           </div>
           <div className="flex gap-6 text-sm">
-            <Link to="/" className="hover:text-white">Home</Link>
-            <a href="/about" className="hover:text-white">About</a>
-            <a href="/contact" className="hover:text-white">Contact</a>
-            <a href="/support" className="hover:text-white">Support</a>
+            <Link to="/" className="hover:text-white">Home</Link><a href="/about" className="hover:text-white">About</a><a href="/contact" className="hover:text-white">Contact</a><a href="/support" className="hover:text-white">Support</a>
           </div>
           <div className="text-sm text-gray-400 text-center md:text-right">
             <p>Made in India 🇮🇳</p>
