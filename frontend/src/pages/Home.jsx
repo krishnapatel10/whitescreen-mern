@@ -232,7 +232,7 @@ export default function Home() {
         {!isFull && (
           <div className="z-1 relative right-35 top-25 w-1/5 p-6 flex flex-col space-y-4">
             <label className="font-semibold">Resolution</label>
-            <select className="border p-2 rounded" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+            <select className="border p-2 cursor-pointer rounded " value={resolution} onChange={(e) => setResolution(e.target.value)}>
                 <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p 2K</option><option value="2160p">2160p 4K</option><option value="4320p">4320p 8K</option><option value="custom">Custom</option>
             </select>
             {resolution === "custom" && (
@@ -241,7 +241,7 @@ export default function Home() {
                 <div className="flex items-center space-x-2"><input type="number" className="border p-2 w-24 rounded" value={customHeight} onChange={(e) => setCustomHeight(Number(e.target.value))} placeholder="1080" /><span>px</span></div>
               </>
             )}
-            <button onClick={downloadImage} className="bg-gray-200 hover:bg-gray-300 p-2 rounded shadow">Download</button>
+            <button onClick={downloadImage} className=" bg-gray-200 cursor-pointer hover:bg-gray-300 p-2 rounded shadow">Download</button>
             <div className="flex items-center space-x-2">
               <input type="color" value={color} onChange={(e) => handleCustomColorChange(e.target.value)} className="w-12 h-10 cursor-pointer" />
               <input type="text" value={customHex} onChange={(e) => handleCustomColorChange(e.target.value)} className="border p-2 w-28 rounded" placeholder="Hex or Name..." />
@@ -258,7 +258,8 @@ export default function Home() {
             <p className="text-sm text-gray-400">A simple color preview & download tool built with React + Tailwind CSS.</p>
           </div>
           <div className="flex gap-6 text-sm">
-            <Link to="/" className="hover:text-white">Home</Link><a href="/about" className="hover:text-white">About</a><a href="/contact" className="hover:text-white">Contact</a><a href="/support" className="hover:text-white">Support</a>
+            <Link to="/" className="hover:text-white">Home</Link><a href="/about" className="hover:text-white">About</a>
+            <a href="/contact" className="hover:text-white">Contact</a>
           </div>
           <div className="text-sm text-gray-400 text-center md:text-right">
             <p>Made in India 🇮🇳</p>

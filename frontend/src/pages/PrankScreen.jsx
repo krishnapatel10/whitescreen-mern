@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import VirusAlert from '../assets/virusalert.png';
-import BlueScreen from "../assets/blueScreen_fullHD.gif";
+import FakeBlueScreen from "../assets/blueScreen_fullHD.gif";
 import brokenscreen from "../assets/broken-screen.webp";
 import FakeUpdate from "../assets/Fake Update Screen GIF.gif";
 import NoiseScreen from "../assets/noise.gif";
@@ -21,7 +21,7 @@ const SIDEBAR_PRANKS = [
 
 const BOTTOM_PRANKS = [
   { name: "Fake Error", type: "error", img: FakeError, slug: "fake-error" },
-  { name: "Blue Screen (BSOD)", type: "bsod", img: BlueScreen, slug: "blue-screen" },
+  { name: "Fake Blue Screen", type: "bsod", img: FakeBlueScreen, slug: "Fake-Blue-Screen" },
   { name: "Virus Alert", type: "virus", img: VirusAlert, slug: "virus-alert" },
   { name: "Matrix Screen", type: "matrix", img: MatrixScreen, slug: "matrix-screen" },
   { name: "Fake Update", type: "update", img: FakeUpdate, slug: "fake-update" },
@@ -206,7 +206,6 @@ export default function PrankScreen() {
             <a href="/" className="hover:text-white">Home</a>
             <a href="/about" className="hover:text-white">About</a>
             <a href="/contact" className="hover:text-white">Contact</a>
-            <a href="/support" className="hover:text-white">Support</a>
           </div>
           <div className="text-sm text-gray-400 text-center md:text-right">
             <p>Made in India 🇮🇳</p>
