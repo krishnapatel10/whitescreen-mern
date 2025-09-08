@@ -53,26 +53,34 @@ export default function About() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 py-6">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-center md:text-left">
-            <h2 className="text-lg font-semibold text-white">WhiteScreen Tool</h2>
-            <p className="text-sm text-gray-400">
-              A simple color preview & download tool built with React + Tailwind CSS.
-            </p>
-          </div>
-          <div className="flex gap-6 text-sm">
-            <Link to="/" className="hover:text-white">Home</Link>
-            <Link to="/about" className="hover:text-white">About</Link>
-            <Link to="/contact" className="hover:text-white">Contact</Link>
-          </div>
-          <div className="text-sm text-gray-400 text-center md:text-right">
-            <p>Made in India 🇮🇳</p>
-            <p>© {new Date().getFullYear()} WhiteScreen Tool. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+     {/* ======================= */}
+{/* Footer (same for all devices) */}
+<footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-gray-300 py-8 mt-auto">
+  <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+    
+    {/* Left Section */}
+    <div className="text-center md:text-left">
+      <h2 className="text-xl font-bold text-white">WhiteScreen Tool</h2>
+      <p className="text-sm text-gray-400 mt-1">
+        A simple color preview & download tool.
+      </p>
+    </div>
+
+    {/* Middle Links */}
+    <div className="flex gap-6 text-sm font-medium">
+      <a href="/" className="hover:text-white transition-colors duration-200">Home</a>
+      <a href="/about" className="hover:text-white transition-colors duration-200">About</a>
+      <a href="/contact" className="hover:text-white transition-colors duration-200">Contact</a>
+    </div>
+
+    {/* Right Section */}
+    <div className="text-center md:text-right text-sm text-gray-400">
+      <p className="mb-1">Made in India 🇮🇳</p>
+      <p className="text-gray-500">© {new Date().getFullYear()} WhiteScreen Tool</p>
+    </div>
+  </div>
+</footer>
+
     </div>
   );
 }

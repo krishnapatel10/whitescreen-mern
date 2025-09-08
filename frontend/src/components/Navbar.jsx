@@ -19,7 +19,7 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-700 hover:text-indigo-600 font-semibold">
-             Color Screen
+              Color Screen
             </Link>
             <Link to="/Prank-Screen" className="text-gray-700 hover:text-indigo-600 font-semibold">
               Prank Screen
@@ -27,7 +27,7 @@ export default function Navbar() {
             <Link to="/about" className="text-gray-700 hover:text-indigo-600 font-semibold">
               About
             </Link>
-           
+
           </div>
 
           {/* Mobile Hamburger */}
@@ -45,32 +45,32 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white shadow-md">
+
+
           <Link
             to="/"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
-          >
-            Home
+            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50">
+            ColorScreen
           </Link>
-          <Link
-            to="/colors"
+
+          <Link to="/Prank-Screen"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
-          >
+            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50">
+            Prank Screen
+          </Link>
+
           <Link
             to="/about"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
-          >
+            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50">
             About
           </Link>
-            Colors
-          </Link>
+
           <Link
             to="/contact"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
-          >
+            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50">
             Contact
           </Link>
         </div>
