@@ -47,11 +47,9 @@ body {
 .preview-title {
   font-size: 2.25rem;
   font-weight: bold;
-  /* margin-bottom: 3rem; */
+  margin-bottom: 4rem;
   color: #1a202c;
   text-align: center;
-  position: relative;
-  top: 40px;
 }
 
 
@@ -67,7 +65,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
+  position: relative;
+  bottom: 25px;
 }
 
 /* Fullscreen state */
@@ -138,12 +138,21 @@ body {
 }
 
 /* ========== Color Boxes (Sidebar & Bottom) ========== */
-.sidebar,
+.sidebar{
+    display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+  bottom: 20px;
+}
 .bottom-colors {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
+  position: relative;
+  bottom: 20px;
 }
 
 .sidebar {

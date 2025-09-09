@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import "./PrankScreen.css"
+import "./PrankScreen.css";
 
 import VirusAlert from '../assets/virusalert.png';
 import FakeBlue from "../assets/blueScreen_fullHD.gif";
