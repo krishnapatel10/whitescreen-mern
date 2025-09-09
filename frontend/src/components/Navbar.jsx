@@ -54,11 +54,11 @@ export default function Navbar() {
             ColorScreen
           </Link>
 
-          <Link to="/Prank-Screen"
+          {/* <Link to="/Prank-Screen"
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2 text-gray-700 hover:bg-indigo-50">
             Prank Screen
-          </Link>
+          </Link> */}
 
           <Link
             to="/about"
