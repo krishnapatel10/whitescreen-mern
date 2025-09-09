@@ -45,7 +45,7 @@ export default function App() {
         <Routes>
           {/* 1. Pehle specific (fixed) routes aayenge */}
           <Route path="/" element={<Home />} />
-          <Route path="/Prank-Screen" element={<PrankScreen />} />
+          <Route path="/PrankScreen" element={<PrankScreen />} />
           <Route path="/About" element={<About />} />
           <Route path="/contact" element={<Contact/>} />
           
